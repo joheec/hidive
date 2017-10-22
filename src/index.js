@@ -19,9 +19,11 @@ class Videos extends React.Component {
 
     this.state = {
       loading: true,
+      hoveredTitle: null,
     }
 
     this.fetchJson = this.fetchJson.bind(this);
+    this.setHoveredTitle = this.setHoveredTitle.bind(this);
   }
 
   render() {
@@ -29,19 +31,37 @@ class Videos extends React.Component {
       <BackgroundDiv>
         {
           this.state.loading == true ? 
-          <LoadingDiv>Currently loading...</LoadingDiv> :
-          this.state.TitleRows.map(category => 
-            <div key={category.Name}>
-              <CategoryDiv>{category.Name}</CategoryDiv>
-              <TitlesDiv>
-                {category.Titles.map(title => 
-                  <TitleDiv key={title.Id}>
-                    <TitleImg src={title.KeyArtUrl} alt={title.Name} />
-                  </TitleDiv>
-                )}
-              </TitlesDiv>
-            </div>
-          )
+            <LoadingDiv>Currently loading...</LoadingDiv> :
+            this.state.TitleRows.map(category => 
+              <div key={category.Name}>
+                <CategoryH3>{category.Name}</CategoryH3>
+                <TitlesDiv>
+                  {category.Titles.map(title => 
+                    <TitleDiv 
+                      key={title.Id}
+                      onMouseEnter={() => this.setHoveredTitle(title.Id)}
+                      onMouseLeave={() => this.setHoveredTitle(null)}
+                      onClick={() => {console.log(this.state)}}
+                    >
+                      {
+                        this.state.hoveredTitle == title.Id ? 
+                          <TitleOverlayDiv>
+                            <TitleOverlayContentDiv>
+                              <h3 style={{margin: '4px'}}>{title.Name}</h3>
+                              <p style={{margin: '4px'}}>
+                                Rating: {title.StarRating} | {title.ShowInfoTitle}<br/>
+                                {title.ShortSynopsis}
+                              </p>
+                            </TitleOverlayContentDiv>
+                          </TitleOverlayDiv> : 
+                          null
+                      }
+                      <TitleImg src={title.KeyArtUrl} alt={title.Name} />
+                    </TitleDiv>
+                  )}
+                </TitlesDiv>
+              </div>
+            )
         }
       </BackgroundDiv>
     );
@@ -84,6 +104,10 @@ class Videos extends React.Component {
         return e
       });
   }
+
+  setHoveredTitle(titleId) {
+    this.setState({hoveredTitle: titleId});
+  }
 }
 
 const LoadingDiv = glamorous.div({
@@ -94,13 +118,13 @@ const BackgroundDiv = glamorous.div({
   margin: '4%',
 });
 
-const CategoryDiv = glamorous.div({
+const CategoryH3 = glamorous.h3({
   color: '#ffffff',
   margin: '5px',
 });
 
 const TitlesDiv = glamorous.div({
-  height: '127px',
+  maxHeight: '254px',
   margin: '0px 5px 5px 5px',
   whiteSpace: 'nowrap',
   overflowX: 'auto',
@@ -108,14 +132,50 @@ const TitlesDiv = glamorous.div({
 
 const TitleDiv = glamorous.div({
   display: 'inline-block',
+  position: 'relative',
+  verticalAlign: 'top',
   margin: '5px',
   width: '218px',
   height: '117px',
+  transitionDuration: '400ms',
+  transitionTimingFunction: 'cubic-bezier(0.5, 0, 0.1, 1)',
+  transitionDelay: '0ms',
+  ':hover': {
+    cursor: 'pointer',
+    width: '436px',
+    height: '234px',
+    transitionDuration: '400ms',
+    transitionTimingFunction: 'cubic-bezier(0.5, 0, 0.1, 1)',
+    transitionDelay: '0ms',
+  },
 });
 
 const TitleImg = glamorous.img({
-  width: '218px',
-  height: '117px',
+  width: '100%',
+  height: '100%',
+});
+
+const TitleOverlayDiv = glamorous.div({
+  position: 'absolute',
+  zIndex: '2',
+  width: '100%',
+  height: '100%',
+  color: '#ffffff',
+  background: 'rgba(0, 0, 0, 0.6)',
+  opacity: '0',
+  ':hover': {
+    opacity: '1',
+    transitionDuration: '400ms',
+    transitionDelay: '400ms',
+  }
+});
+
+const TitleOverlayContentDiv = glamorous.div({
+  whiteSpace: 'normal',
+  margin: '4px',
+  position: 'absolute',
+  left: '0',
+  bottom: '0',
 });
 
 ReactDom.render(<Videos />, root);
