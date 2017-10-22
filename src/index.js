@@ -5,6 +5,7 @@ import glamorous from 'glamorous';
 
 //Requires a proxy otherwise response is missing Access-Control-Allow-Origin header.
 const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+const localProxyUrl = 'http://localhost:8081/';
 const url = 'https://d10xkldqejj5hr.cloudfront.net/dev/dashboard.json';
 
 const root = document.createElement('div');
@@ -19,6 +20,8 @@ class Videos extends React.Component {
     this.state = {
       loading: true,
     }
+
+    this.fetchJson = this.fetchJson.bind(this);
   }
 
   render() {
@@ -45,10 +48,23 @@ class Videos extends React.Component {
   }
 
   componentDidMount() {
-    fetch(proxyUrl + url)
+    this.fetchJson(proxyUrl + url)
       .then(response => {
+        if (response) {
+          console.log(`Attempting fetch with cors-proxy hosted locally at ${localProxyUrl}.`);
+          this.fetchJson(localProxyUrl + url);
+        }
+      });
+  }
+
+  fetchJson(url) {
+    return fetch(url)
+      .then(response => 
         response.json()
           .then(content => {
+            if (!content) {
+              throw new Error('No content received from fetch');
+            }
             this.setState({...content});
             console.log(this.state);
             return this.state['loading'];
@@ -58,12 +74,14 @@ class Videos extends React.Component {
               this.setState({loading: false});
             }
           })
-          .catch(() => {
-            console.log('Unable to set state with JSON');
-          });
-      })
-      .catch(() => {
-        console.log('Error in fetching JSON');
+          .catch(e => {
+            console.log(`Unable to set state with JSON (${e})`);
+            return e;
+          })
+      )
+      .catch(e => {
+        console.log(`Unable to fetch JSON using ${url} (${e})`);
+        return e
       });
   }
 }
