@@ -20,10 +20,12 @@ class Videos extends React.Component {
     this.state = {
       loading: true,
       hoveredTitle: null,
+      clickedTitle: null,
     }
 
     this.fetchJson = this.fetchJson.bind(this);
     this.setHoveredTitle = this.setHoveredTitle.bind(this);
+    this.setClickedTitle = this.setClickedTitle.bind(this);
   }
 
   render() {
@@ -39,9 +41,9 @@ class Videos extends React.Component {
                   {category.Titles.map(title => 
                     <TitleDiv 
                       key={title.Id}
-                      onMouseEnter={() => this.setHoveredTitle(title.Id)}
-                      onMouseLeave={() => this.setHoveredTitle(null)}
-                      onClick={() => {console.log(this.state)}}
+                      onMouseEnter={() => this.setHoveredTitle(title, category.Name)}
+                      onMouseLeave={() => this.setHoveredTitle(null, null)}
+                      onClick={() => this.setClickedTitle(title, category.Name)}
                     >
                       {
                         this.state.hoveredTitle == title.Id ? 
@@ -56,10 +58,32 @@ class Videos extends React.Component {
                           </TitleOverlayDiv> : 
                           null
                       }
-                      <TitleImg src={title.KeyArtUrl} alt={title.Name} />
+                      <TitleImg src={title.MasterArtUrl} alt={title.Name} />
                     </TitleDiv>
                   )}
                 </TitlesDiv>
+                {
+                  this.state.clickedTitle != null && category.Name == this.state.clickedTitle.category ?
+                    <TitleDetailsDiv>
+                      <ColumnHeadDiv>
+                        <h3>{this.state.clickedTitle.Name}</h3>
+                        <p>
+                          {this.state.clickedTitle.ShowInfoTitle}<br />
+                          Rating: {this.state.clickedTitle.StarRating}
+                        </p>
+                      </ColumnHeadDiv>
+                      <ColumnTextDiv>
+                        <p>
+                          {this.state.clickedTitle.LongSynopsis}
+                        </p>
+                      </ColumnTextDiv>
+                      <ColumnImageDiv>
+                        <TitleDetailsImg src={this.state.clickedTitle.KeyArtUrl} alt={this.state.clickedTitle.Name} />
+                      </ColumnImageDiv>
+                      <CloseSpan onClick={() => this.setClickedTitle(null, null)}>X</CloseSpan>
+                    </TitleDetailsDiv> :
+                    null
+                }
               </div>
             )
         }
@@ -86,7 +110,6 @@ class Videos extends React.Component {
               throw new Error('No content received from fetch');
             }
             this.setState({...content});
-            console.log(this.state);
             return this.state['loading'];
           })
           .then(loadingStatus => {
@@ -105,8 +128,30 @@ class Videos extends React.Component {
       });
   }
 
-  setHoveredTitle(titleId) {
+  setHoveredTitle(title, titleCategory) {
+    let titleId = title == null ? null : title.Id
     this.setState({hoveredTitle: titleId});
+    if (this.state.clickedTitle != null && title != null && titleCategory != null && 
+        this.state.clickedTitle.Id != title.Id && titleCategory == this.state.clickedTitle.category) {
+      this.setState({
+        clickedTitle: {
+          ...title,
+          category: titleCategory,
+        }
+      });
+    }
+  }
+
+  setClickedTitle(clickedTitle, titleCategory) {
+    let newState = clickedTitle == null ?  
+      {clickedTitle: null} :
+      {
+        clickedTitle: {
+          ...clickedTitle,
+          category: titleCategory
+        }
+      }; 
+    this.setState(newState);
   }
 }
 
@@ -176,6 +221,44 @@ const TitleOverlayContentDiv = glamorous.div({
   position: 'absolute',
   left: '0',
   bottom: '0',
+});
+
+const TitleDetailsDiv = glamorous.div({
+  display: 'block',
+  textAlign: 'left',
+  height: '300px',
+  color: '#ffffff',
+});
+
+const TitleDetailsImg = glamorous.img({
+  width: '100%',
+  height: '100%',
+});
+
+const ThemeColumnDiv = glamorous.div({
+  display: 'inline-block',
+  margin: '10px',
+  verticalAlign: 'top',
+  height: '100%',
+  color: '#ffffff',
+});
+
+const ColumnHeadDiv = glamorous(ThemeColumnDiv)({
+  width: '20%'
+});
+
+const ColumnTextDiv = glamorous(ThemeColumnDiv)({
+  width: '30%',
+});
+
+const ColumnImageDiv = glamorous(ThemeColumnDiv)({
+  width: '45%',
+});
+
+const CloseSpan = glamorous.span({
+  cursor: 'pointer',
+  position: 'absolute',
+  right: '50px',
 });
 
 ReactDom.render(<Videos />, root);
