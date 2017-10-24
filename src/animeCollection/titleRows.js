@@ -2,7 +2,7 @@ import React from 'react';
 import glamor from 'glamor';
 import glamorous from 'glamorous';
 import Title from './title';
-import TitleDetail from './title-detail';
+import TitleDetail from './titleDetail';
 
 export default class TitleRows extends React.Component {
   constructor(props) {
@@ -63,7 +63,6 @@ export default class TitleRows extends React.Component {
   }
 
   setClickedTitle(clickedTitle, titleCategory) {
-    console.log(titleCategory);
     let newState = clickedTitle == null ?  
       {clickedTitle: null} :
       {

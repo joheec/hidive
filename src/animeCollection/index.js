@@ -1,7 +1,7 @@
 import React from 'react';
 import glamor from 'glamor';
 import glamorous from 'glamorous';
-import TitleRows from './title-rows';
+import TitleRows from './titleRows';
 
 //Requires a proxy otherwise response is missing Access-Control-Allow-Origin header.
 const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
