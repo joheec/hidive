@@ -34,15 +34,16 @@ export default class TitleRows extends React.Component {
                   setClickedTitle={this.setClickedTitle}
                 />
               )
-            }{
-              this.state.clickedTitle != null && category.Name == this.state.clickedTitle.category ?
-                <TitleDetail 
-                  setClickedTitle={this.setClickedTitle}
-                  clickedTitle={this.state.clickedTitle}
-                /> :
-                null
             }
           </TitlesDiv>
+          {
+            this.state.clickedTitle != null && category.Name == this.state.clickedTitle.category ?
+              <TitleDetail 
+                setClickedTitle={this.setClickedTitle}
+                clickedTitle={this.state.clickedTitle}
+              /> :
+              null
+          }
         </div>
       )
     );
