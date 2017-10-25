@@ -20,6 +20,7 @@ module.exports = {
       title: "hidive",
     }),
     new webpack.HotModuleReplacementPlugin(),
+    new webpack.optimize.UglifyJsPlugin(),
   ],
   module: {
     rules: [
